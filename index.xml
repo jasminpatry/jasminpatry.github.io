@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>glowybits</title>
+    <link>http://www.glowybits.com/index.xml</link>
+    <description>Recent content on glowybits</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Jasmin Patry</copyright>
+    <lastBuildDate>Wed, 16 Nov 2016 21:14:05 -0800</lastBuildDate>
+    <atom:link href="http://www.glowybits.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>First Post!</title>
+      <link>http://www.glowybits.com/blog/2016/11/16/first_post/</link>
+      <pubDate>Wed, 16 Nov 2016 21:14:05 -0800</pubDate>
+      
+      <guid>http://www.glowybits.com/blog/2016/11/16/first_post/</guid>
+      <description>&lt;p&gt;Welcome to my blog! Please stay tuned for what I hope you&amp;rsquo;ll find to be interesting content related to graphics, games, programming, and other geeky pursuits!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>about</title>
+      <link>http://www.glowybits.com/page/about/</link>
+      <pubDate>Tue, 13 Sep 2016 22:04:50 -0700</pubDate>
+      
+      <guid>http://www.glowybits.com/page/about/</guid>
+      <description>&lt;p&gt;Hi! I&amp;rsquo;m &lt;a href=&#34;https://twitter.com/jasminpatry
+&#34;&gt;Jasmin Patry&lt;/a&gt;, and this is my blog. I&amp;rsquo;m a Rendering Software Engineer at
+&lt;a href=&#34;http://www.suckerpunch.com&#34;&gt;Sucker Punch&lt;/a&gt;, where I&amp;rsquo;ve worked on Infamous 2, Infamous Second Son, and Infamous First
+Light. Previously, I worked at &lt;a href=&#34;https://en.wikipedia.org/wiki/Radical_Entertainment&#34;&gt;Radical Entertainment&lt;/a&gt; on the Hulk,
+Scarface, and Prototype games. I started making 3D video games as a computer science graduate student at the University
+of Waterloo, where I made &lt;a href=&#34;https://en.wikipedia.org/wiki/Tux_Racer&#34;&gt;Tux Racer&lt;/a&gt; as a project for my graphics class, and I
+haven&amp;rsquo;t looked back since!&lt;/p&gt;
+
+&lt;p&gt;By the way: Sucker Punch is &lt;a href=&#34;http://jobs.suckerpunch.com/&#34;&gt;hiring&lt;/a&gt;!&lt;/p&gt;
+
+&lt;p&gt;I live in the Seattle area with my wonderful family: my wife, son, and our dog Penelope.&lt;/p&gt;
+
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://www.glowybits.com/images/penny.jpg&#34; /&gt;
+    
+    
+    &lt;figcaption&gt;
+        &lt;h4&gt;Penelope&lt;/h4&gt;
+        
+    &lt;/figcaption&gt;
+    
+&lt;/figure&gt;
+
+</description>
+    </item>
+    
+  </channel>
+</rss>
