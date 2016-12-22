@@ -123,11 +123,13 @@ approximations. The ACES transforms are written in a language not too dissimilar
 was straightforward.</p>
 
 <p>We fit curves to the grayscale output of the ACES reference rendering transform (RRT) + output device transform (ODT)
-for both SDR and HDR displays. Since we feed the output of our tonemapper to a 3D color LUT (in sRGB space), we
-converted the output of the ACES transform to (unclamped) sRGB and included that in the curve fit.</p>
+for both SDR and HDR displays. Like Krzysztof, we scaled the input to the function to be more consistent with our old
+tonemapper. Since we feed the output of our tonemapper to a 3D color LUT (in sRGB space), we converted the output of the
+ACES transform to (unclamped) sRGB and included that in the curve fit.</p>
 <div class="highlight"><pre><code class="language-C++" data-lang="C++"><span class="c1">// Convert a linear RGB color to an unclamped sRGB-encoded color after applying approximate </span>
-<span class="c1">//  ACES HDR tonemapping. Input is assumed to be non-negative. Output is scaled so that 1.0 </span>
-<span class="c1">//  corresponds 100 nits; the maximum output is ~2.7 (the sRGB encoding of 10.0 = 1000 nits).</span>
+<span class="c1">//  ACES HDR tonemapping (with input scaled by 2.05). Input is assumed to be non-negative. </span>
+<span class="c1">//  Output is scaled so that 1.0 corresponds 100 nits; the maximum output is ~2.7 (the sRGB </span>
+<span class="c1">//  encoding of 10.0 = 1000 nits).</span>
 
 <span class="n">float3</span> <span class="nf">RgbAcesHdrSrgb</span><span class="p">(</span><span class="n">float3</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>
@@ -137,7 +139,7 @@ converted the output of the ACES transform to (unclamped) sRGB and included that
 <span class="p">}</span>
 
 <span class="c1">// Convert a linear RGB color to an sRGB-encoded color after applying approximate ACES SDR </span>
-<span class="c1">//  tonemapping. Input is assumed to be non-negative.</span>
+<span class="c1">//  tonemapping (with input scaled by 2.05). Input is assumed to be non-negative.</span>
 
 <span class="n">float3</span> <span class="nf">RgbAcesSdrSrgb</span><span class="p">(</span><span class="n">float3</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>

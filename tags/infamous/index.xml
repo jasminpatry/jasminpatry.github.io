@@ -50,11 +50,13 @@ approximations. The ACES transforms are written in a language not too dissimilar
 was straightforward.&lt;/p&gt;
 
 &lt;p&gt;We fit curves to the grayscale output of the ACES reference rendering transform (RRT) + output device transform (ODT)
-for both SDR and HDR displays. Since we feed the output of our tonemapper to a 3D color LUT (in sRGB space), we
-converted the output of the ACES transform to (unclamped) sRGB and included that in the curve fit.&lt;/p&gt;
+for both SDR and HDR displays. Like Krzysztof, we scaled the input to the function to be more consistent with our old
+tonemapper. Since we feed the output of our tonemapper to a 3D color LUT (in sRGB space), we converted the output of the
+ACES transform to (unclamped) sRGB and included that in the curve fit.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-C++&#34; data-lang=&#34;C++&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// Convert a linear RGB color to an unclamped sRGB-encoded color after applying approximate &lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;//  ACES HDR tonemapping. Input is assumed to be non-negative. Output is scaled so that 1.0 &lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;//  corresponds 100 nits; the maximum output is ~2.7 (the sRGB encoding of 10.0 = 1000 nits).&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;//  ACES HDR tonemapping (with input scaled by 2.05). Input is assumed to be non-negative. &lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;//  Output is scaled so that 1.0 corresponds 100 nits; the maximum output is ~2.7 (the sRGB &lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;//  encoding of 10.0 = 1000 nits).&lt;/span&gt;
 
 &lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;RgbAcesHdrSrgb&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
@@ -64,7 +66,7 @@ converted the output of the ACES transform to (unclamped) sRGB and included that
 &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
 
 &lt;span class=&#34;c1&#34;&gt;// Convert a linear RGB color to an sRGB-encoded color after applying approximate ACES SDR &lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;//  tonemapping. Input is assumed to be non-negative.&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;//  tonemapping (with input scaled by 2.05). Input is assumed to be non-negative.&lt;/span&gt;
 
 &lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;RgbAcesSdrSrgb&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
