@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>HDR Display Support in Infamous Second Son and Infamous First Light (Part 1) &middot; glowybits</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://www.glowybits.com/css/normalize.css">
+        <link rel="stylesheet" href="http://www.glowybits.com/css/style.css">
+        <link rel="stylesheet" href="http://www.glowybits.com/css/monokai.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cabin:400,400i,700,700i|Open+Sans:400,400i,700,700i&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-87165311-1', 'auto');
+ga('send', 'pageview');
+</script>
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            
+                                <h1 class="site-title">
+                                    <a title="glowybits" href="http://www.glowybits.com/">glowybits</a>
+                                </h1>
+                            
+                        
+                        
+                            <h1 class="site-about">
+                                
+                                <a title="About" href="/page/about/">About</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://www.glowybits.com/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/jasminpatry">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                    </div>
+
+                    
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">HDR Display Support in Infamous Second Son and Infamous First Light (Part 1)</h1>
+    
+    <p class="post-byline">
+        Posted by
+        <span class="post-author" itemscope="" itemprop="author" itemtype="http://schema.org/Person">
+            <span itemprop="name">
+                <a href="https://twitter.com/jasminpatry" itemprop="url" rel="author">Jasmin Patry</a>
+            </span>
+        </span>
+        on
+        <span class="post-date">
+            <time datetime="2016-12-21" itemprop="datePublished">December 21, 2016</time>
+        </span>
+    </p>
+</header>
+
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<h1 id="introduction">Introduction</h1>
+
+<p>Last month, <a href="https://www.suckerpunch.com/">Sucker Punch</a> released patches for both Infamous Second Son and First Light that added HDR and 4K
+display support. This two-post series will focus on some of the technical aspects of adding HDR support to these games;
+I&rsquo;ll save a discussion of 4K support for a (possible) separate post. (For a more consumer-oriented description of the
+features we added with these patches, please see Jason Connell&rsquo;s <a href="http://blog.us.playstation.com/2016/11/04/infamous-second-son-first-light-showcase-power-of-ps4-pro/">post</a> on the PlayStation Blog).</p>
+
+<p>When we started working with HDR displays back in early 2016, we weren&rsquo;t sure what to expect. Some of us had seen
+impressive HDR demos on show floors, but experience has taught us that reality doesn&rsquo;t always live up to the hype.
+Fortunately, HDR did not dissapoint.</p>
+
+<p>It turned out that both PS4 Infamous games were ideally suited for HDR displays. Both games were authored and rendered
+with physically-based HDR lighting pipelines; only at the very end of the frame did we tonemap and color grade to SDR.
+Our adherence to physically-based lighting principles meant that we didn&rsquo;t use any lighting &ldquo;hacks&rdquo; that broke down when
+we switched to HDR display output; as a result, we didn&rsquo;t have to re-author any content for HDR; everything just worked,
+and looked better. Our heroes&rsquo; superpowers looked especially good when displayed on a good HDR TV; color and details were
+visible that previously washed out to white.</p>
+
+<p>In this post I&rsquo;ll discuss our HDR tonemapping and color grading solutions, and the HDR-friendly render target format we
+used to help improve performance.</p>
+
+<h1 id="tonemapping">Tonemapping</h1>
+
+<p>At Sucker Punch, we&rsquo;ve switched to (approximate) <a href="https://github.com/ampas/aces-dev/">ACES</a> filmic tonemapping (inspired by Krzysztof
+Narkowicz&rsquo;s <a href="https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/">post</a>), and we&rsquo;ve been very happy with the results. Since ACES also has an HDR output device
+transform (ODT), it made sense to try it. (Krzysztof also did the same thing in parallel, which he&rsquo;s written
+about <a href="https://knarkowicz.wordpress.com/2016/08/31/hdr-display-first-steps/">here</a>.)</p>
+
+<p>We inititally ported the entire ACES RRT+ODT pipeline to PSSL (the PS4&rsquo;s shader language), to validate our
+approximations. The ACES transforms are written in a language not too dissimilar from shader code, so this conversion
+was straightforward.</p>
+
+<p>We fit curves to the grayscale output of the ACES reference rendering transform (RRT) + output device transform (ODT)
+for both SDR and HDR displays. Since we feed the output of our tonemapper to a 3D color LUT (in sRGB space), we
+converted the output of the ACES transform to (unclamped) sRGB and included that in the curve fit.</p>
+<div class="highlight"><pre><code class="language-C++" data-lang="C++"><span class="c1">// Convert a linear RGB color to an unclamped sRGB-encoded color after applying approximate </span>
+<span class="c1">//  ACES HDR tonemapping. Input is assumed to be non-negative. Output is scaled so that 1.0 </span>
+<span class="c1">//  corresponds 100 nits; the maximum output is ~2.7 (the sRGB encoding of 10.0 = 1000 nits).</span>
+
+<span class="n">float3</span> <span class="nf">RgbAcesHdrSrgb</span><span class="p">(</span><span class="n">float3</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">2708.7142</span> <span class="o">+</span> <span class="mf">6801.1525</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1079.5474</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.1614649</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.00004139375</span><span class="p">)</span> <span class="o">/</span>
+        <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">983.38937</span> <span class="o">+</span> <span class="mf">4132.0662</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2881.6522</span><span class="p">)</span> <span class="o">+</span> <span class="mf">128.35911</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Convert a linear RGB color to an sRGB-encoded color after applying approximate ACES SDR </span>
+<span class="c1">//  tonemapping. Input is assumed to be non-negative.</span>
+
+<span class="n">float3</span> <span class="nf">RgbAcesSdrSrgb</span><span class="p">(</span><span class="n">float3</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">saturate</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">8.4680</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.002957</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.0001004</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.0000001274</span><span class="p">)</span> <span class="o">/</span>
+            <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">8.3604</span> <span class="o">+</span> <span class="mf">1.8227</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.2189</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.002117</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.00003673</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<figure class="fr">
+    <a href="/images/ifl_iss_hdr/aces_hdr_log_log.png">
+        <img src="/images/ifl_iss_hdr/aces_hdr_log_log.png" />
+    </a>
+    
+    <figcaption>
+        <h4>Log-Log Plot of ACES HDR Approximation</h4>
+        
+    </figcaption>
+    
+</figure>
+
+
+
+<figure class="fr">
+    <a href="/images/ifl_iss_hdr/aces_hdr_logx.png">
+        <img src="/images/ifl_iss_hdr/aces_hdr_logx.png" />
+    </a>
+    
+    <figcaption>
+        <h4>Log-Linear (sRGB) Plot of ACES HDR Approximation</h4>
+        
+    </figcaption>
+    
+</figure>
+
+
+<p>These approximations are an excellent match for grayscale values; the main difference is in red tones, which the ACES
+RRT explicitly modifies. The ACES code also desaturates bright colors more quickly than we do. It should be possible to
+achieve a better match by combining this curve with 3D LUT color grading, although this isn&rsquo;t something we&rsquo;ve tried.</p>
+
+<p>I&rsquo;ve included some A/B comparisons between full ACES and the per-channel approximation below. (Please note that these
+screenshots were taken in SDR mode with color grading disabled.)</p>
+
+<p>Since we were so happy with how the ACES HDR tonemapping curve looked, we decided to switch to ACES for SDR mode too.
+This made the two modes more consistent in their overall look, and we felt that it gave the colors in SDR mode a nice
+added kick.</p>
+
+<div class="clearfix"></div>
+
+<figure>
+<img onclick="ImageFlip(this, '/images/ifl_iss_hdr/iflredcar_approx.jpg')" src="/images/ifl_iss_hdr/iflredcar_aces.jpg">
+<figcaption>
+
+<h4>An example of a scene where the difference between the full ACES implementation and our approximation is relatively significant, because of the predominance of red tones.<br>(Click the image to flip.)</h4> 
+
+</figcaption>
+</figure>
+
+<figure>
+<img onclick="ImageFlip(this, '/images/ifl_iss_hdr/iflpanda_approx.jpg')" src="/images/ifl_iss_hdr/iflpanda_aces.jpg">
+<figcaption>
+<h4>The difference is much more subtle in this scene.<br>(Click the image to flip.)</h4>
+</figcaption>
+</figure>
+
+<h1 id="color-grading">Color Grading</h1>
+
+<p>As mentioned above, we used a 3D color LUT for color grading in both games. These were authored for SDR TVs, so they
+assume an input range of [0, 1]. Since time and resources were limited, we didn&rsquo;t want to have to re-author these LUTs
+to accomodate HDR output, nor did we want to switch to a different color grading technique for HDR mode.</p>
+
+<p>We opted for a simple solution: we remapped the HDR tonemapped output to approximately match the SDR tonemapped output.
+After color grading, we expand the range back to HDR using the inverse scale. The end result is close enough to the SDR
+output, qualitatively, that we didn&rsquo;t feel the need to make any other additional changes.</p>
+<div class="highlight"><pre><code class="language-C++" data-lang="C++"><span class="c1">// Smoothly clamp x to 1.0</span>
+
+<span class="kt">float</span> <span class="nf">ColorGradeSmoothClamp</span><span class="p">(</span><span class="kt">float</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="kt">float</span> <span class="n">u</span> <span class="o">=</span> <span class="mf">0.525</span><span class="p">;</span>
+    
+    <span class="kt">float</span> <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">-</span> <span class="n">u</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">u</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">u</span> <span class="o">-</span> <span class="n">x</span> <span class="o">/</span> <span class="n">u</span><span class="p">))</span> <span class="o">/</span> <span class="mf">4.0</span><span class="p">;</span>
+    
+    <span class="k">return</span> <span class="p">(</span><span class="n">abs</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">u</span><span class="p">)</span> <span class="o">?</span> <span class="nl">q</span> <span class="p">:</span> <span class="n">saturate</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Approximate SDR color grading with an HDR image</span>
+
+<span class="n">float3</span> <span class="nf">ColorGradeHdr</span><span class="p">(</span><span class="n">float3</span> <span class="n">rgbHdr</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Find the maximum component</span>
+
+    <span class="kt">float</span> <span class="n">gMax</span> <span class="o">=</span> <span class="n">max3</span><span class="p">(</span><span class="n">rgbHdr</span><span class="p">.</span><span class="n">r</span><span class="p">,</span> <span class="n">rgbHdr</span><span class="p">.</span><span class="n">g</span><span class="p">,</span> <span class="n">rgbHdr</span><span class="p">.</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">gMax</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">gMax</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">);</span>
+    
+    <span class="c1">// Clamp HDR to 0-1 range, and calculate scale for re-expansion</span>
+
+    <span class="kt">float</span> <span class="n">gClamped</span> <span class="o">=</span> <span class="n">ColorGradeSmoothClamp</span><span class="p">(</span><span class="n">gMax</span><span class="p">);</span>
+    <span class="kt">float</span> <span class="n">rScale</span> <span class="o">=</span> <span class="n">gClamped</span> <span class="o">/</span> <span class="n">gMax</span><span class="p">;</span>
+    
+    <span class="c1">// Perform standard SDR color grading</span>
+    
+    <span class="n">float3</span> <span class="n">rgbGraded</span> <span class="o">=</span> <span class="n">ColorGrade</span><span class="p">(</span><span class="n">rgbHdr</span> <span class="o">*</span> <span class="n">rScale</span><span class="p">);</span>
+
+    <span class="c1">// Re-expand to HDR</span>
+
+    <span class="k">return</span> <span class="n">rgbGrade</span> <span class="o">/</span> <span class="n">rScale</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<figure>
+<a href="https://www.desmos.com/calculator/fhcl3p1mwp"><img src="/images/ifl_iss_hdr/hdr_remap.png"></a>
+<figcaption>
+<h4>The sRGB-encoded ACES tonemapping curves along with the remapped HDR curve. (<a href="https://www.desmos.com/calculator/fhcl3p1mwp">Desmos version</a>) </h4>
+</figcaption>
+</figure>
+
+<h1 id="render-target-formats">Render Target Formats</h1>
+
+<p>With HDR displays, RGBA8 buffers simply do not have enough precision to represent the desired output range without
+introducing additional banding artifacts. The PS4 requires the back buffer to be <a href="https://en.wikipedia.org/wiki/Perceptual_Quantizer">PQ</a> encoded (part of the <a href="https://en.wikipedia.org/wiki/HDR10">HDR10</a>
+standard) in an RGB10A2 buffer, but that doesn&rsquo;t mean that we need to use this encoding for all of our post-tonemap
+rendering. Also, the color space of the back buffer must be <a href="https://en.wikipedia.org/wiki/Rec._2020">Rec. 2020</a> (instead of <a href="https://en.wikipedia.org/wiki/Rec._709">Rec. 709</a> for
+SDR), but since none of the assets were authored for this color space, we can delay the conversion as long as we
+wish.</p>
+
+<p>In both games, the 2D UI is rendered with alpha blending in sRGB (&ldquo;gamma&rdquo;) space. Rendering to a PQ buffer would require
+us to do &ldquo;software&rdquo; blending, which would be expensive since we would need to do the following:</p>
+
+<ol>
+<li>Convert from PQ to linear</li>
+<li>Convert from Rec. 2020 to Rec. 709</li>
+<li>Convert from linear to sRGB</li>
+<li>Blend</li>
+<li>Perform the inverse of steps 3 to 1.</li>
+</ol>
+
+<p>A better option is to render UI to a separate buffer (in sRGB 709 space), and composite as a final step. We chose a
+third way which avoids the use of a separate buffer. Instead of tonemapping to PQ 2020, we encode to a format we call
+sRGB10, which is valid over the domain of 0-10 linear (about 0-2.7 sRGB) &mdash; recall that 1.0 corresponds to the SDR peak
+luminance of 100 nits, while 10.0 (linear) corresponds to 1000 nits, the peak output luminance of our HDR tonemapping
+function.</p>
+
+<p>The sRGB10 encoding function is given by:</p>
+
+<div>$$f_\mathrm{srgb10}\left(x_\mathrm{linear}\right) = \frac{f_\mathrm{srgb}\left(x_\mathrm{linear}\right)}{f_\mathrm{srgb}\left(10\right)}$$</div>
+
+<p>where <code>$f_{srgb}$</code> is the sRGB encoding function. We can then render UI directly into this buffer with alpha blending,
+and the output will be identical to SDR mode, as long as we scale the UI shader output by <code>$1 / f_\mathrm{srgb}\left(10\right)$</code>.
+Because of the sRGB10 gamma encoding, very bright objects in our games do not overwhelm the UI elements blended on top of them.</p>
+
+<p>This format retains more than 8 bits of precision for the SDR portion of the curve <span
+class="nobr">($0 \le x_\mathrm{linear} \le 1$)</span>. Unfortunately, it&rsquo;s not possible to use hardware sRGB encoding and decoding,
+since the sRGB and sRGB10 curves don&rsquo;t match. (Even if they did, on the PS4&rsquo;s GCN hardware, the sRGB conversion only
+preserves 8 bits of precision, making it inappropriate for use with HDR signals.)</p>
+
+<p>Switching to this format (from RGBA16F) was the single most effective HDR performance optimization,
+since it significantly reduced the bandwidth requirements of our antialiasing and 4K upscaling passes.</p>
+
+<p>(I wasn&rsquo;t aware of it until writing this post, but NVIDIA describes a similar approach <a href="https://developer.nvidia.com/displaying-hdr-nuts-and-bolts">here</a>, though that approach
+uses a floating-point buffer instead of a fixed-point buffer, and is scaled slightly differently.)</p>
+
+<h1 id="stay-tuned">Stay Tuned!</h1>
+
+<p>In Part 2 of this series I&rsquo;ll discuss a couple more performance optimizations we made, how we
+matched the look of the SDR and HDR modes (in the darker parts of the image), as well as some issues we ran into when
+combining HDR and 4K on the PS4 Pro.</p>
+
+<h1 id="references-and-further-reading">References and Further Reading</h1>
+
+<ol>
+<li>Krzysztof Narkowicz, <a href="https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/">ACES Filmic Tone Mapping Curve</a>.</li>
+<li>Krzysztof Narkowicz, <a href="https://knarkowicz.wordpress.com/2016/08/31/hdr-display-first-steps/">HDR Display – First Steps</a>.</li>
+<li>Evan Hart (NVIDIA), <a href="https://developer.nvidia.com/displaying-hdr-nuts-and-bolts">Displaying HDR Nuts and Bolts</a>.</li>
+<li>Jeroen Soethoudt (Nixxes), Jurjen Katsman (Nixxes), and Holger Gruen (NVIDIA), <a href="https://developer.nvidia.com/implementing-hdr-rise-tomb-raider">Implementing HDR in &lsquo;Rise of the Tomb Raider&rsquo;</a>.</li>
+<li>Scott Miller (Dolby Laboratories), <a href="https://www.smpte.org/sites/default/files/2014-05-06-EOTF-Miller-1-2-handout.pdf">A Perceptual EOTF for Extended Dynamic Range Imagery</a>.</li>
+</ol>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+                 <a href="/tags/hdr/">HDR</a>
+            
+                 <a href="/tags/infamous/">Infamous</a>
+            
+                 <a href="/tags/graphics/">Graphics</a>
+            
+        </p>
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=HDR%20Display%20Support%20in%20Infamous%20Second%20Son%20and%20Infamous%20First%20Light%20%28Part%201%29&url=http%3a%2f%2fwww.glowybits.com%2fblog%2f2016%2f12%2f21%2fifl_iss_hdr_1%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fwww.glowybits.com%2fblog%2f2016%2f12%2f21%2fifl_iss_hdr_1%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fwww.glowybits.com%2fblog%2f2016%2f12%2f21%2fifl_iss_hdr_1%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+        
+    <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'glowybits';
+    var disqus_identifier = 'http:\/\/www.glowybits.com\/blog\/2016\/12\/21\/ifl_iss_hdr_1\/';
+    var disqus_title = 'HDR Display Support in Infamous Second Son and Infamous First Light (Part 1)';
+    var disqus_url = 'http:\/\/www.glowybits.com\/blog\/2016\/12\/21\/ifl_iss_hdr_1\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="glowybits" href="http://www.glowybits.com/">glowybits</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span class="nobr">&copy; 2016 Jasmin Patry /</span>
+                    <span class="nobr">Hosted by <a href="http://pages.github.com" >Github Pages</a> /</span>
+                    <span class="nobr">Powered by <a href="http://gohugo.io/">Hugo</a> /</span>
+                    <span class="nobr">Based on <a href="https://github.com/jbub/ghostwriter">Ghostwriter</a> theme</span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://www.glowybits.com/js/jquery-1.11.3.min.js"></script>
+        <script src="http://www.glowybits.com/js/jquery.fitvids.js"></script>
+        <script src="http://www.glowybits.com/js/scripts.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+         MathJax.Hub.Config({
+             tex2jax: {
+                 inlineMath: [['$','$'], ['\\(','\\)']],
+                 displayMath: [['$$','$$'], ['\\[','\\]']],
+                 processEscapes: true,
+                 processEnvironments: true,
+                 skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                 TeX: { equationNumbers: { autoNumber: "AMS" },
+                        extensions: ["AMSmath.js", "AMSsymbols.js"] }
+             }
+         });
+         MathJax.Hub.Queue(function() {
+             
+             
+             
+             var all = MathJax.Hub.getAllJax(), i;
+             for(i = 0; i < all.length; i += 1) {
+                 all[i].SourceElement().parentNode.className += ' has-jax';
+             }
+         });
+      </script>
+    </body>
+</html>
+

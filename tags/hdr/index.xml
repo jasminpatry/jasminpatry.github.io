@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Post-rsses on glowybits</title>
-    <link>http://www.glowybits.com/post/index.xml</link>
-    <description>Recent content in Post-rsses on glowybits</description>
+    <title>glowybits</title>
+    <link>http://www.glowybits.com/tags/hdr/index.xml</link>
+    <description>Recent content on glowybits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Jasmin Patry</copyright>
-    <lastBuildDate>Wed, 21 Dec 2016 23:07:41 -0800</lastBuildDate>
-    <atom:link href="http://www.glowybits.com/post/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://www.glowybits.com/tags/hdr/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>HDR Display Support in Infamous Second Son and Infamous First Light (Part 1)</title>
@@ -243,16 +242,6 @@ combining HDR and 4K on the PS4 Pro.&lt;/p&gt;
 &lt;li&gt;Jeroen Soethoudt (Nixxes), Jurjen Katsman (Nixxes), and Holger Gruen (NVIDIA), &lt;a href=&#34;https://developer.nvidia.com/implementing-hdr-rise-tomb-raider&#34;&gt;Implementing HDR in &amp;lsquo;Rise of the Tomb Raider&amp;rsquo;&lt;/a&gt;.&lt;/li&gt;
 &lt;li&gt;Scott Miller (Dolby Laboratories), &lt;a href=&#34;https://www.smpte.org/sites/default/files/2014-05-06-EOTF-Miller-1-2-handout.pdf&#34;&gt;A Perceptual EOTF for Extended Dynamic Range Imagery&lt;/a&gt;.&lt;/li&gt;
 &lt;/ol&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>First Post!</title>
-      <link>http://www.glowybits.com/blog/2016/11/16/first_post/</link>
-      <pubDate>Wed, 16 Nov 2016 21:14:05 -0800</pubDate>
-      
-      <guid>http://www.glowybits.com/blog/2016/11/16/first_post/</guid>
-      <description>&lt;p&gt;Welcome to my blog! Please stay tuned for what I hope you&amp;rsquo;ll find to be interesting content related to graphics, games, programming, and other geeky pursuits!&lt;/p&gt;
 </description>
     </item>
     

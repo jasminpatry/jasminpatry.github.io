@@ -7,8 +7,244 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Jasmin Patry</copyright>
-    <lastBuildDate>Wed, 16 Nov 2016 21:14:05 -0800</lastBuildDate>
+    <lastBuildDate>Wed, 21 Dec 2016 23:07:41 -0800</lastBuildDate>
     <atom:link href="http://www.glowybits.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>HDR Display Support in Infamous Second Son and Infamous First Light (Part 1)</title>
+      <link>http://www.glowybits.com/blog/2016/12/21/ifl_iss_hdr_1/</link>
+      <pubDate>Wed, 21 Dec 2016 23:07:41 -0800</pubDate>
+      
+      <guid>http://www.glowybits.com/blog/2016/12/21/ifl_iss_hdr_1/</guid>
+      <description>
+
+&lt;h1 id=&#34;introduction&#34;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;Last month, &lt;a href=&#34;https://www.suckerpunch.com/&#34;&gt;Sucker Punch&lt;/a&gt; released patches for both Infamous Second Son and First Light that added HDR and 4K
+display support. This two-post series will focus on some of the technical aspects of adding HDR support to these games;
+I&amp;rsquo;ll save a discussion of 4K support for a (possible) separate post. (For a more consumer-oriented description of the
+features we added with these patches, please see Jason Connell&amp;rsquo;s &lt;a href=&#34;http://blog.us.playstation.com/2016/11/04/infamous-second-son-first-light-showcase-power-of-ps4-pro/&#34;&gt;post&lt;/a&gt; on the PlayStation Blog).&lt;/p&gt;
+
+&lt;p&gt;When we started working with HDR displays back in early 2016, we weren&amp;rsquo;t sure what to expect. Some of us had seen
+impressive HDR demos on show floors, but experience has taught us that reality doesn&amp;rsquo;t always live up to the hype.
+Fortunately, HDR did not dissapoint.&lt;/p&gt;
+
+&lt;p&gt;It turned out that both PS4 Infamous games were ideally suited for HDR displays. Both games were authored and rendered
+with physically-based HDR lighting pipelines; only at the very end of the frame did we tonemap and color grade to SDR.
+Our adherence to physically-based lighting principles meant that we didn&amp;rsquo;t use any lighting &amp;ldquo;hacks&amp;rdquo; that broke down when
+we switched to HDR display output; as a result, we didn&amp;rsquo;t have to re-author any content for HDR; everything just worked,
+and looked better. Our heroes&amp;rsquo; superpowers looked especially good when displayed on a good HDR TV; color and details were
+visible that previously washed out to white.&lt;/p&gt;
+
+&lt;p&gt;In this post I&amp;rsquo;ll discuss our HDR tonemapping and color grading solutions, and the HDR-friendly render target format we
+used to help improve performance.&lt;/p&gt;
+
+&lt;h1 id=&#34;tonemapping&#34;&gt;Tonemapping&lt;/h1&gt;
+
+&lt;p&gt;At Sucker Punch, we&amp;rsquo;ve switched to (approximate) &lt;a href=&#34;https://github.com/ampas/aces-dev/&#34;&gt;ACES&lt;/a&gt; filmic tonemapping (inspired by Krzysztof
+Narkowicz&amp;rsquo;s &lt;a href=&#34;https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/&#34;&gt;post&lt;/a&gt;), and we&amp;rsquo;ve been very happy with the results. Since ACES also has an HDR output device
+transform (ODT), it made sense to try it. (Krzysztof also did the same thing in parallel, which he&amp;rsquo;s written
+about &lt;a href=&#34;https://knarkowicz.wordpress.com/2016/08/31/hdr-display-first-steps/&#34;&gt;here&lt;/a&gt;.)&lt;/p&gt;
+
+&lt;p&gt;We inititally ported the entire ACES RRT+ODT pipeline to PSSL (the PS4&amp;rsquo;s shader language), to validate our
+approximations. The ACES transforms are written in a language not too dissimilar from shader code, so this conversion
+was straightforward.&lt;/p&gt;
+
+&lt;p&gt;We fit curves to the grayscale output of the ACES reference rendering transform (RRT) + output device transform (ODT)
+for both SDR and HDR displays. Since we feed the output of our tonemapper to a 3D color LUT (in sRGB space), we
+converted the output of the ACES transform to (unclamped) sRGB and included that in the curve fit.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-C++&#34; data-lang=&#34;C++&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// Convert a linear RGB color to an unclamped sRGB-encoded color after applying approximate &lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;//  ACES HDR tonemapping. Input is assumed to be non-negative. Output is scaled so that 1.0 &lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;//  corresponds 100 nits; the maximum output is ~2.7 (the sRGB encoding of 10.0 = 1000 nits).&lt;/span&gt;
+
+&lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;RgbAcesHdrSrgb&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;2708.7142&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;6801.1525&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;1079.5474&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;1.1614649&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.00004139375&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;983.38937&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;4132.0662&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;2881.6522&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;128.35911&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;1.0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;max&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;c1&#34;&gt;// Convert a linear RGB color to an sRGB-encoded color after applying approximate ACES SDR &lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;//  tonemapping. Input is assumed to be non-negative.&lt;/span&gt;
+
+&lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;RgbAcesSdrSrgb&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;saturate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+            &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;8.4680&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;1.0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.002957&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.0001004&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.0000001274&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;
+            &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;8.3604&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;1.8227&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.2189&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.002117&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.00003673&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;));&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;figure class=&#34;fr&#34;&gt;
+    &lt;a href=&#34;http://www.glowybits.com/images/ifl_iss_hdr/aces_hdr_log_log.png&#34;&gt;
+        &lt;img src=&#34;http://www.glowybits.com/images/ifl_iss_hdr/aces_hdr_log_log.png&#34; /&gt;
+    &lt;/a&gt;
+    
+    &lt;figcaption&gt;
+        &lt;h4&gt;Log-Log Plot of ACES HDR Approximation&lt;/h4&gt;
+        
+    &lt;/figcaption&gt;
+    
+&lt;/figure&gt;
+
+
+
+&lt;figure class=&#34;fr&#34;&gt;
+    &lt;a href=&#34;http://www.glowybits.com/images/ifl_iss_hdr/aces_hdr_logx.png&#34;&gt;
+        &lt;img src=&#34;http://www.glowybits.com/images/ifl_iss_hdr/aces_hdr_logx.png&#34; /&gt;
+    &lt;/a&gt;
+    
+    &lt;figcaption&gt;
+        &lt;h4&gt;Log-Linear (sRGB) Plot of ACES HDR Approximation&lt;/h4&gt;
+        
+    &lt;/figcaption&gt;
+    
+&lt;/figure&gt;
+
+
+&lt;p&gt;These approximations are an excellent match for grayscale values; the main difference is in red tones, which the ACES
+RRT explicitly modifies. The ACES code also desaturates bright colors more quickly than we do. It should be possible to
+achieve a better match by combining this curve with 3D LUT color grading, although this isn&amp;rsquo;t something we&amp;rsquo;ve tried.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;ve included some A/B comparisons between full ACES and the per-channel approximation below. (Please note that these
+screenshots were taken in SDR mode with color grading disabled.)&lt;/p&gt;
+
+&lt;p&gt;Since we were so happy with how the ACES HDR tonemapping curve looked, we decided to switch to ACES for SDR mode too.
+This made the two modes more consistent in their overall look, and we felt that it gave the colors in SDR mode a nice
+added kick.&lt;/p&gt;
+
+&lt;div class=&#34;clearfix&#34;&gt;&lt;/div&gt;
+
+&lt;figure&gt;
+&lt;img onclick=&#34;ImageFlip(this, &#39;/images/ifl_iss_hdr/iflredcar_approx.jpg&#39;)&#34; src=&#34;http://www.glowybits.com/images/ifl_iss_hdr/iflredcar_aces.jpg&#34;&gt;
+&lt;figcaption&gt;
+
+&lt;h4&gt;An example of a scene where the difference between the full ACES implementation and our approximation is relatively significant, because of the predominance of red tones.&lt;br&gt;(Click the image to flip.)&lt;/h4&gt; 
+
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+&lt;img onclick=&#34;ImageFlip(this, &#39;/images/ifl_iss_hdr/iflpanda_approx.jpg&#39;)&#34; src=&#34;http://www.glowybits.com/images/ifl_iss_hdr/iflpanda_aces.jpg&#34;&gt;
+&lt;figcaption&gt;
+&lt;h4&gt;The difference is much more subtle in this scene.&lt;br&gt;(Click the image to flip.)&lt;/h4&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h1 id=&#34;color-grading&#34;&gt;Color Grading&lt;/h1&gt;
+
+&lt;p&gt;As mentioned above, we used a 3D color LUT for color grading in both games. These were authored for SDR TVs, so they
+assume an input range of [0, 1]. Since time and resources were limited, we didn&amp;rsquo;t want to have to re-author these LUTs
+to accomodate HDR output, nor did we want to switch to a different color grading technique for HDR mode.&lt;/p&gt;
+
+&lt;p&gt;We opted for a simple solution: we remapped the HDR tonemapped output to approximately match the SDR tonemapped output.
+After color grading, we expand the range back to HDR using the inverse scale. The end result is close enough to the SDR
+output, qualitatively, that we didn&amp;rsquo;t feel the need to make any other additional changes.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code class=&#34;language-C++&#34; data-lang=&#34;C++&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// Smoothly clamp x to 1.0&lt;/span&gt;
+
+&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;ColorGradeSmoothClamp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;u&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.525&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    
+    &lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;q&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;2.0&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;u&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;1.0&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;u&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;2.0&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;2.0&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;u&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;u&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;4.0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;abs&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;1.0&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;u&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;?&lt;/span&gt; &lt;span class=&#34;nl&#34;&gt;q&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;saturate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+
+&lt;span class=&#34;c1&#34;&gt;// Approximate SDR color grading with an HDR image&lt;/span&gt;
+
+&lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;ColorGradeHdr&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rgbHdr&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;c1&#34;&gt;// Find the maximum component&lt;/span&gt;
+
+    &lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;gMax&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;max3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rgbHdr&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rgbHdr&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;g&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rgbHdr&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;n&#34;&gt;gMax&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;max&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gMax&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;1e-6&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    
+    &lt;span class=&#34;c1&#34;&gt;// Clamp HDR to 0-1 range, and calculate scale for re-expansion&lt;/span&gt;
+
+    &lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;gClamped&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ColorGradeSmoothClamp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;gMax&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+    &lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rScale&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;gClamped&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;gMax&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+    
+    &lt;span class=&#34;c1&#34;&gt;// Perform standard SDR color grading&lt;/span&gt;
+    
+    &lt;span class=&#34;n&#34;&gt;float3&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rgbGraded&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ColorGrade&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rgbHdr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rScale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+
+    &lt;span class=&#34;c1&#34;&gt;// Re-expand to HDR&lt;/span&gt;
+
+    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rgbGrade&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rScale&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;figure&gt;
+&lt;a href=&#34;https://www.desmos.com/calculator/fhcl3p1mwp&#34;&gt;&lt;img src=&#34;http://www.glowybits.com/images/ifl_iss_hdr/hdr_remap.png&#34;&gt;&lt;/a&gt;
+&lt;figcaption&gt;
+&lt;h4&gt;The sRGB-encoded ACES tonemapping curves along with the remapped HDR curve. (&lt;a href=&#34;https://www.desmos.com/calculator/fhcl3p1mwp&#34;&gt;Desmos version&lt;/a&gt;) &lt;/h4&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h1 id=&#34;render-target-formats&#34;&gt;Render Target Formats&lt;/h1&gt;
+
+&lt;p&gt;With HDR displays, RGBA8 buffers simply do not have enough precision to represent the desired output range without
+introducing additional banding artifacts. The PS4 requires the back buffer to be &lt;a href=&#34;https://en.wikipedia.org/wiki/Perceptual_Quantizer&#34;&gt;PQ&lt;/a&gt; encoded (part of the &lt;a href=&#34;https://en.wikipedia.org/wiki/HDR10&#34;&gt;HDR10&lt;/a&gt;
+standard) in an RGB10A2 buffer, but that doesn&amp;rsquo;t mean that we need to use this encoding for all of our post-tonemap
+rendering. Also, the color space of the back buffer must be &lt;a href=&#34;https://en.wikipedia.org/wiki/Rec._2020&#34;&gt;Rec. 2020&lt;/a&gt; (instead of &lt;a href=&#34;https://en.wikipedia.org/wiki/Rec._709&#34;&gt;Rec. 709&lt;/a&gt; for
+SDR), but since none of the assets were authored for this color space, we can delay the conversion as long as we
+wish.&lt;/p&gt;
+
+&lt;p&gt;In both games, the 2D UI is rendered with alpha blending in sRGB (&amp;ldquo;gamma&amp;rdquo;) space. Rendering to a PQ buffer would require
+us to do &amp;ldquo;software&amp;rdquo; blending, which would be expensive since we would need to do the following:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Convert from PQ to linear&lt;/li&gt;
+&lt;li&gt;Convert from Rec. 2020 to Rec. 709&lt;/li&gt;
+&lt;li&gt;Convert from linear to sRGB&lt;/li&gt;
+&lt;li&gt;Blend&lt;/li&gt;
+&lt;li&gt;Perform the inverse of steps 3 to 1.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;A better option is to render UI to a separate buffer (in sRGB 709 space), and composite as a final step. We chose a
+third way which avoids the use of a separate buffer. Instead of tonemapping to PQ 2020, we encode to a format we call
+sRGB10, which is valid over the domain of 0-10 linear (about 0-2.7 sRGB) &amp;mdash; recall that 1.0 corresponds to the SDR peak
+luminance of 100 nits, while 10.0 (linear) corresponds to 1000 nits, the peak output luminance of our HDR tonemapping
+function.&lt;/p&gt;
+
+&lt;p&gt;The sRGB10 encoding function is given by:&lt;/p&gt;
+
+&lt;div&gt;$$f_\mathrm{srgb10}\left(x_\mathrm{linear}\right) = \frac{f_\mathrm{srgb}\left(x_\mathrm{linear}\right)}{f_\mathrm{srgb}\left(10\right)}$$&lt;/div&gt;
+
+&lt;p&gt;where &lt;code&gt;$f_{srgb}$&lt;/code&gt; is the sRGB encoding function. We can then render UI directly into this buffer with alpha blending,
+and the output will be identical to SDR mode, as long as we scale the UI shader output by &lt;code&gt;$1 / f_\mathrm{srgb}\left(10\right)$&lt;/code&gt;.
+Because of the sRGB10 gamma encoding, very bright objects in our games do not overwhelm the UI elements blended on top of them.&lt;/p&gt;
+
+&lt;p&gt;This format retains more than 8 bits of precision for the SDR portion of the curve &lt;span
+class=&#34;nobr&#34;&gt;($0 \le x_\mathrm{linear} \le 1$)&lt;/span&gt;. Unfortunately, it&amp;rsquo;s not possible to use hardware sRGB encoding and decoding,
+since the sRGB and sRGB10 curves don&amp;rsquo;t match. (Even if they did, on the PS4&amp;rsquo;s GCN hardware, the sRGB conversion only
+preserves 8 bits of precision, making it inappropriate for use with HDR signals.)&lt;/p&gt;
+
+&lt;p&gt;Switching to this format (from RGBA16F) was the single most effective HDR performance optimization,
+since it significantly reduced the bandwidth requirements of our antialiasing and 4K upscaling passes.&lt;/p&gt;
+
+&lt;p&gt;(I wasn&amp;rsquo;t aware of it until writing this post, but NVIDIA describes a similar approach &lt;a href=&#34;https://developer.nvidia.com/displaying-hdr-nuts-and-bolts&#34;&gt;here&lt;/a&gt;, though that approach
+uses a floating-point buffer instead of a fixed-point buffer, and is scaled slightly differently.)&lt;/p&gt;
+
+&lt;h1 id=&#34;stay-tuned&#34;&gt;Stay Tuned!&lt;/h1&gt;
+
+&lt;p&gt;In Part 2 of this series I&amp;rsquo;ll discuss a couple more performance optimizations we made, how we
+matched the look of the SDR and HDR modes (in the darker parts of the image), as well as some issues we ran into when
+combining HDR and 4K on the PS4 Pro.&lt;/p&gt;
+
+&lt;h1 id=&#34;references-and-further-reading&#34;&gt;References and Further Reading&lt;/h1&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Krzysztof Narkowicz, &lt;a href=&#34;https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/&#34;&gt;ACES Filmic Tone Mapping Curve&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Krzysztof Narkowicz, &lt;a href=&#34;https://knarkowicz.wordpress.com/2016/08/31/hdr-display-first-steps/&#34;&gt;HDR Display – First Steps&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Evan Hart (NVIDIA), &lt;a href=&#34;https://developer.nvidia.com/displaying-hdr-nuts-and-bolts&#34;&gt;Displaying HDR Nuts and Bolts&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Jeroen Soethoudt (Nixxes), Jurjen Katsman (Nixxes), and Holger Gruen (NVIDIA), &lt;a href=&#34;https://developer.nvidia.com/implementing-hdr-rise-tomb-raider&#34;&gt;Implementing HDR in &amp;lsquo;Rise of the Tomb Raider&amp;rsquo;&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Scott Miller (Dolby Laboratories), &lt;a href=&#34;https://www.smpte.org/sites/default/files/2014-05-06-EOTF-Miller-1-2-handout.pdf&#34;&gt;A Perceptual EOTF for Extended Dynamic Range Imagery&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
     
     <item>
       <title>First Post!</title>

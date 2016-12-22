@@ -17,4 +17,11 @@ jQuery(function($) {
     });
 });
 
-hljs.initHighlightingOnLoad();
+function ImageFlip(e, u) {
+	if (!e.otherSrc) {
+		e.otherSrc = u;
+	}
+	u = e.src;
+	e.src = e.otherSrc;
+	e.otherSrc = u	;
+}
