@@ -131,7 +131,7 @@ to implemement.&lt;/p&gt;
 &lt;p&gt;We fit a curve to the PQ OETF which saves a few cycles, and the results are visually indistinguishable from the exact
 function. The curve was optimized to be accurate between 0.01 nits (a reasonable value for a &amp;ldquo;just noticeable
 difference&amp;rdquo; from black) and 1400 nits (the maximum output luminance that we generate, after matching SDR TV output, as
-explained below).&lt;/p&gt;
+explained above).&lt;/p&gt;
 
 &lt;figure&gt;
 &lt;a href=&#34;https://www.desmos.com/calculator/qbyomhxua3&#34;&gt;&lt;img src=&#34;http://www.glowybits.com/images/ifl_iss_hdr/pq_curve_fit.png&#34;&gt;&lt;/a&gt;
@@ -178,7 +178,7 @@ using a compute shader and LDS memory to amortize the conversion of samples.&lt;
 
 &lt;h1 id=&#34;in-closing&#34;&gt;In Closing&amp;hellip;&lt;/h1&gt;
 
-&lt;p&gt;I hope you&amp;rsquo;ve found these post useful &amp;mdash; please don&amp;rsquo;t hesitate to leave comments or questions below!&lt;/p&gt;
+&lt;p&gt;I hope you&amp;rsquo;ve found these posts useful &amp;mdash; please don&amp;rsquo;t hesitate to leave comments or questions below!&lt;/p&gt;
 
 &lt;h1 id=&#34;further-reading&#34;&gt;Further Reading&lt;/h1&gt;
 
