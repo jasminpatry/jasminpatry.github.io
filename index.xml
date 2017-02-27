@@ -7,8 +7,37 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Jasmin Patry</copyright>
-    <lastBuildDate>Wed, 04 Jan 2017 07:39:39 -0800</lastBuildDate>
+    <lastBuildDate>Sun, 26 Feb 2017 16:45:54 -0800</lastBuildDate>
     <atom:link href="http://www.glowybits.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Filmic Tonemapping and the Scene-to-Screen Transform</title>
+      <link>http://www.glowybits.com/blog/2017/02/26/scene_to_screen/</link>
+      <pubDate>Sun, 26 Feb 2017 16:45:54 -0800</pubDate>
+      
+      <guid>http://www.glowybits.com/blog/2017/02/26/scene_to_screen/</guid>
+      <description>&lt;p&gt;Shortly after publishing my &lt;a href=&#34;http://www.glowybits.com/blog/2017/01/04/ifl_iss_hdr_2/&#34;&gt;last post&lt;/a&gt;, I started thinking about the similarity
+between the scene-to-screen transforms that I showed there, and the shape of the &amp;ldquo;toe&amp;rdquo; of filmic tonemapping operators, and
+I realized that they&amp;rsquo;re both doing the same thing: compensating for the dim or dark surround of the viewing
+environment. A filmic tonemapping operator is simulating the response of film that will then be projected in
+a dark theatre, so it has the &amp;ldquo;scene-to-screen&amp;rdquo; transform already baked in.&lt;/p&gt;
+
+&lt;p&gt;Looking at the &lt;a href=&#34;https://github.com/ampas/aces-dev/blob/master/transforms/ctl/odt/rec709/ODT.Academy.Rec709_100nits_dim.ctl&#34;&gt;source code&lt;/a&gt; of the ACES
+Rec. 709 ODT, for example, it clearly mentions that it&amp;rsquo;s intended for a display
+with a dim surround, indicating that it&amp;rsquo;s already taken the scene-to-screen transform into account. This is further
+confirmed by the fact that the output is encoded with the inverse BT.1886 EOTF.&lt;/p&gt;
+
+&lt;figure&gt;
+&lt;img src=&#34;http://www.glowybits.com/images/scene_to_screen/filmic_vs_sts.png&#34;&gt;&lt;/a&gt;
+&lt;figcaption&gt;
+&lt;h4&gt;The &#34;toe&#34; (the region from 0 to about 0.15) of the ACES filmic tonemapping curve (here shown without input pre-scaling) is qualitatively similar to the scene-to-screen transform formed by the concatenation of the Rec. 709 OETF and BT.1886 EOTF.&lt;/h4&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;The upshot is that if you want to faithfully apply a filmic tonemapping operator such as ACES, you should modify it to
+cancel out any scene-to-screen transform that is applied on your final signal.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>HDR Display Support in Infamous Second Son and Infamous First Light (Part 2)</title>
