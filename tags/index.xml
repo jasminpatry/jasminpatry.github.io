@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on glowybits</title>
+    <link>https://www.glowybits.com/tags/</link>
+    <description>Recent content in Tags on glowybits</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Jasmin Patry</copyright>
+    <lastBuildDate>Sun, 26 Feb 2017 16:45:54 -0800</lastBuildDate><atom:link href="https://www.glowybits.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Graphics</title>
+      <link>https://www.glowybits.com/tags/graphics/</link>
+      <pubDate>Sun, 26 Feb 2017 16:45:54 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/graphics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>HDR</title>
+      <link>https://www.glowybits.com/tags/hdr/</link>
+      <pubDate>Sun, 26 Feb 2017 16:45:54 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/hdr/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Infamous</title>
+      <link>https://www.glowybits.com/tags/infamous/</link>
+      <pubDate>Wed, 04 Jan 2017 07:39:39 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/infamous/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

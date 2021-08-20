@@ -141,9 +141,7 @@ href="https://www.smpte.org/sites/default/files/2014-05-06-EOTF-Miller-1-2-hando
 709 OETF is rarely used in practice — at least in film and television.) As can be seen in the graph above, the Rec. 709
 OETF significantly darkens dark colors when combined with the BT.1886 EOTF, so before adopting the Rec. 709 OETF, make
 sure that this combination works well with your content. For our games, we ended up issuing a new patch with a contrast
-option that allowed users to switch to the old (sRGB-based) OETF curve.</p>
-</p>
-</figure>
+option that allowed users to switch to the old (sRGB-based) OETF curve.</p></figure></p>
 <p>It is clear from the graph above that the combination of the Rec. 709 OETF and the BT.1886 EOTF significantly darkens
 dark colors. Other OETF/EOTF combinations also have this result (though less pronounced) &mdash; this even occurs when sRGB
 colors are displayed with gamma 2.2, even though the average gamma of the sRGB OETF is <span class="nobr">1.0 /
@@ -188,8 +186,7 @@ explained above).</p>
 <h4>Log-Log Plot of PQ OETF Approximation (<a href="https://www.desmos.com/calculator/qbyomhxua3">Desmos version</a>)</h4>
 </figcaption>
 </figure>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++">
-<span class="c1">// Fast PQ encoding. Input is assumed to be positive and scaled such that 1.0 corresponds to 100 nits. Accurate over range 
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="c1">// Fast PQ encoding. Input is assumed to be positive and scaled such that 1.0 corresponds to 100 nits. Accurate over range 
 </span><span class="c1">//  0.01 - 1400 nits (and reasonable behavior outside of that range). 
 </span><span class="c1"></span>
 <span class="n">float3</span> <span class="nf">RgbPqFromLinearFast</span><span class="p">(</span><span class="n">float3</span> <span class="n">x</span><span class="p">)</span>
@@ -207,8 +204,7 @@ visually indistinguishable (but beware of error accumulation from repeated use).
 <h4>Log-Log Plot of sRGB to Linear Approximation (<a href="https://www.desmos.com/calculator/aqixhefatb">Desmos version</a>)</h4>
 </figcaption>
 </figure>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++">
-<span class="c1">// Fast(er) approximate sRGB-to-linear conversion. Accurate over range 0-2.7 (0-10 linear).
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="c1">// Fast(er) approximate sRGB-to-linear conversion. Accurate over range 0-2.7 (0-10 linear).
 </span><span class="c1"></span>
 <span class="n">float3</span> <span class="nf">RgbLinearFromSrgbFast</span><span class="p">(</span><span class="n">float3</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>
