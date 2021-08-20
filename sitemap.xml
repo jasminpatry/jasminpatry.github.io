@@ -1,29 +1,38 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://www.glowybits.com/</loc>
+    <loc>https://www.glowybits.com/blog/2017/02/26/scene_to_screen/</loc>
     <lastmod>2017-02-26T16:45:54-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://www.glowybits.com/blog/2017/02/26/scene_to_screen/</loc>
+  </url><url>
+    <loc>https://www.glowybits.com/</loc>
     <lastmod>2017-02-26T16:45:54-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://www.glowybits.com/blog/2017/01/04/ifl_iss_hdr_2/</loc>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/graphics/</loc>
+    <lastmod>2017-02-26T16:45:54-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/hdr/</loc>
+    <lastmod>2017-02-26T16:45:54-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/post/</loc>
+    <lastmod>2017-02-26T16:45:54-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/</loc>
+    <lastmod>2017-02-26T16:45:54-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/blog/2017/01/04/ifl_iss_hdr_2/</loc>
     <lastmod>2017-01-04T07:39:39-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://www.glowybits.com/blog/2016/12/21/ifl_iss_hdr_1/</loc>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/infamous/</loc>
+    <lastmod>2017-01-04T07:39:39-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/blog/2016/12/21/ifl_iss_hdr_1/</loc>
     <lastmod>2016-12-21T23:07:41-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://www.glowybits.com/page/about/</loc>
+  </url><url>
+    <loc>https://www.glowybits.com/page/about/</loc>
+    <lastmod>2016-09-13T22:04:50-07:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/page/</loc>
     <lastmod>2016-09-13T22:04:50-07:00</lastmod>
   </url>
-  
 </urlset>

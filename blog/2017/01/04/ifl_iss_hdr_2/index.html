@@ -7,12 +7,12 @@
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="generator" content="Hugo 0.87.0" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="http://www.glowybits.com/css/normalize.css">
-        <link rel="stylesheet" href="http://www.glowybits.com/css/style.css">
-        <link rel="stylesheet" href="http://www.glowybits.com/css/monokai.css">
+        <link rel="stylesheet" href="https://www.glowybits.com/css/normalize.css">
+        <link rel="stylesheet" href="https://www.glowybits.com/css/style.css">
+        <link rel="stylesheet" href="https://www.glowybits.com/css/monokai.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cabin:400,400i,700,700i|Open+Sans:400,400i,700,700i&subset=latin,cyrillic-ext,latin-ext,cyrillic">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -24,16 +24,18 @@
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-87165311-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-87165311-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
-
         <div id="wrapper">
             <header class="site-header">
                 <div class="container">
@@ -41,17 +43,16 @@ ga('send', 'pageview');
                         
                             
                                 <h1 class="site-title">
-                                    <a title="glowybits" href="http://www.glowybits.com/">glowybits</a>
+                                    <a title="glowybits" href="https://www.glowybits.com/">glowybits</a>
                                 </h1>
                             
                         
                         
                             <h1 class="site-about">
-                                
-                                <a title="About" href="/page/about/">About</a>
+                                <a title="About" href="https://www.glowybits.com/page/about/index.html">About</a>
                             </h1>
                         
-                        <a class="button-square" href="http://www.glowybits.com/index.xml"><i class="fa fa-rss"></i></a>
+                        <a class="button-square" href="https://www.glowybits.com/index.xml"><i class="fa fa-rss"></i></a>
                         
                             <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/jasminpatry">
                                 <i class="fa fa-twitter"></i>
@@ -94,80 +95,60 @@ ga('send', 'pageview');
         <div class="post-content clearfix" itemprop="articleBody">
     
 
-    
-
-<h1 id="welcome-back-and-happy-new-year">Welcome Back! (And Happy New Year!)</h1>
-
+    <h1 id="welcome-back-and-happy-new-year">Welcome Back! (And Happy New Year!)</h1>
 <p>This is the second post of a two-part series discussing the technical aspects of adding HDR support to Infamous Second
 Son and Infamous First Light. If you haven&rsquo;t read it already, <a href="/blog/2016/12/21/ifl_iss_hdr_1/">Part 1</a> discusses our
 HDR tonemapping and color grading solutions, as well as the HDR-friendly render target format we used to help improve
 performance. In this post I&rsquo;ll discuss how we matched the look of the SDR and HDR modes (in the darker parts of the
 image), a couple more performance optimizations, as well as some issues we ran into when combining HDR and 4K on the PS4
 Pro.</p>
-
 <h1 id="matching-sdr-hdtv-output">Matching SDR HDTV Output</h1>
-
 <p>When we started working with HDR, we realized fairly early on that taking a linear tonemapped image, encoding it with
 PQ, and displaying it on an HDR TV resulted in a &ldquo;washed-out&rdquo;, unsaturated look compared to SDR mode, especially in
 the darker parts of the image. Before I can explain why this occurs, we&rsquo;ll need to take a detour into the land of SDR
 OETFs and EOTFs.</p>
-
 <h2 id="sdr-transfer-functions">SDR Transfer Functions</h2>
-
 <p>Regular SDR HDTVs use an EOTF (electro-optical transfer function) that is governed by the <a href="https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.1886-0-201103-I!!PDF-E.pdf">BT.1886</a>
 standard. It specifies a gamma of 2.4, while the <a href="https://en.wikipedia.org/wiki/Rec._709">Rec. 709</a> standard, which describes the OETF (opto-electrical
 transfer function) for HDTV signals, specifies a function with an average gamma of about 0.5. The product of these gamma
 exponents (about 1.2) results in a non-identity &ldquo;scene-to-screen&rdquo; transfer function which has the effect of increasing
 the image constrast, especially in the dark areas. (In practice there is a lot of variance in both the OETFs used to
 produce content, and in the EOTFs implemented by displays. For more on this, see the sidebar below.)</p>
-
 <figure>
 <a href="https://www.desmos.com/calculator/rbvn5ppsfo"><img src="/images/ifl_iss_hdr/sts_srgb.png"></a>
 <figcaption>
 <h4>Scene-to-screen transforms for a few different OETF/EOTF combinations, with both axes in sRGB space. (See the <a href="https://www.desmos.com/calculator/rbvn5ppsfo">Desmos version</a> for linear and log-log plots.)</h4>
 </figcaption>
 </figure>
-
 <figure class="fr">
 <h4>The Rec. 709 OETF: A Cautionary Tale</h4>
 <p>
-
-At Sucker Punch, we&rsquo;ve attempted to emulate the Rec. 709 OETF since Infamous 2, by using the console's video-out
+<p>At Sucker Punch, we’ve attempted to emulate the Rec. 709 OETF since Infamous 2, by using the console&rsquo;s video-out
 hardware to apply a gamma curve to our sRGB output signal. However, the PS4 supports the automatic conversion of sRGB
-signals to the exact Rec. 709 OETF, so we decided to switch to that for these patches &mdash; following the standard
-more precisely seemed like a good idea!
-
+signals to the exact Rec. 709 OETF, so we decided to switch to that for these patches — following the standard
+more precisely seemed like a good idea!</p>
 </p>
-
 <p>
-
-The switch resulted in deeper blacks, which we thought looked good in the test scenes we examined on our TVs.
-However, after we shipped the patches, we heard reports from some users about &ldquo;crushed blacks,&rdquo; so we decided to investigate.
-It turned out that the TVs we were using for testing produced lighter blacks than the TVs some of our users were using. 
-This, combined with the darker Rec. 709 OETF, resulted in much deeper blacks than we intended on some TVs. 
-
+<p>The switch resulted in deeper blacks, which we thought looked good in the test scenes we examined on our TVs.
+However, after we shipped the patches, we heard reports from some users about “crushed blacks,” so we decided to investigate.
+It turned out that the TVs we were using for testing produced lighter blacks than the TVs some of our users were using.
+This, combined with the darker Rec. 709 OETF, resulted in much deeper blacks than we intended on some TVs.</p>
 </p>
-
 <p>
-
-While the Rec. 709 standard specifies a precise OETF, it admits (in a footnote) that in practice the OETF is adjusted to
+<p>While the Rec. 709 standard specifies a precise OETF, it admits (in a footnote) that in practice the OETF is adjusted to
 achieve the desired output when viewed on a TV conforming to BT.1886. (Scott Miller from Dolby <a
 href="https://www.smpte.org/sites/default/files/2014-05-06-EOTF-Miller-1-2-handout.pdf">claims</a> that the actual Rec.
-709 OETF is rarely used in practice &mdash; at least in film and television.) As can be seen in the graph above, the Rec. 709
+709 OETF is rarely used in practice — at least in film and television.) As can be seen in the graph above, the Rec. 709
 OETF significantly darkens dark colors when combined with the BT.1886 EOTF, so before adopting the Rec. 709 OETF, make
 sure that this combination works well with your content. For our games, we ended up issuing a new patch with a contrast
-option that allowed users to switch to the old (sRGB-based) OETF curve.
-
+option that allowed users to switch to the old (sRGB-based) OETF curve.</p>
 </p>
-
 </figure>
-
 <p>It is clear from the graph above that the combination of the Rec. 709 OETF and the BT.1886 EOTF significantly darkens
 dark colors. Other OETF/EOTF combinations also have this result (though less pronounced) &mdash; this even occurs when sRGB
 colors are displayed with gamma 2.2, even though the average gamma of the sRGB OETF is <span class="nobr">1.0 /
 2.2</span>. The important thing to note is that for SDR displays in general, the OETF and EOTF are not inverses of each
 other.</p>
-
 <p>You may be asking yourself <em>why</em> it&rsquo;s desirable to have a non-identity scene-to-screen transform. Shouldn&rsquo;t we be aiming
 to have the TV faithfully reproduce the relative luminance values of the scene we&rsquo;re rendering? The answer that you find
 in textbooks (e.g., Section 3.4 in <em>Principles of Digital Image Synthesis</em> by Andrew Glassner, and <a href="http://www.poynton.com/PDFs/TIDV/Gamma.pdf">Chapter 6</a> of <em>A
@@ -175,25 +156,18 @@ Technical Introduction to Digital Video</em> by Charles Poynton) is that the inc
 dim surround conditions in which the display is typically viewed, which has the effect of reducing apparent contrast.
 This argument seems less relevant for games, since they are typically authored in similar viewing conditions than those in which
 they are played &mdash; but it&rsquo;s a reality of SDR displays that we need to be aware of.</p>
-
 <h2 id="what-about-hdr">What About HDR?</h2>
-
 <p>Thankfully, things are somewhat simpler for HDR displays: the PQ EOTF and OETF <em>are</em> inverses of each other. However,
 this means that if you want the darker portions of your HDR image to resemble the SDR image you&rsquo;ve spent so much time
 tweaking, then you need to apply the scene-to-screen transform yourself. Using the notation $f(x)$ for OETFs and $F(x)$
 for EOTFs, we computed the final PQ value as follows:</p>
-
 <div class="clearfix"></div>
-
 <div>$$x_\mathrm{pq} = f_\mathrm{pq}\left(F_\mathrm{1886}\left(f_\mathrm{709}\left(x_\mathrm{linear}\right)\right)\right)$$</div>
-
 <p>We used this transform over the entire range of values, even those greater than 1.0. This increased the maximum
 luminance of our signal (from 1000 nits to about 1400 nits), but we were very pleased with the results and so did not
 attempt to treat values greater than 1.0 differently.</p>
-
 <p>To demonstrate the difference, I&rsquo;ve simulated the effect of removing the scene-to-screen transform on a couple of SDR images
 below (click the images to toggle between the versions with and without the scene-to-screen transform).</p>
-
 <figure>
 <img onclick="ImageFlip(this, '/images/ifl_iss_hdr/nosts_fish_market.jpg')" src="/images/ifl_iss_hdr/sts_fish_market.jpg">
 <img onclick="ImageFlip(this, '/images/ifl_iss_hdr/nosts_space_needle.jpg')" src="/images/ifl_iss_hdr/sts_space_needle.jpg">
@@ -201,66 +175,54 @@ below (click the images to toggle between the versions with and without the scen
 <h4>Scenes with and without the scene-to-screen transform applied. (Click the images to toggle.)</h4> 
 </figcaption>
 </figure>
-
 <h1 id="optimized-pq-and-srgb-conversions">Optimized PQ and sRGB Conversions</h1>
-
 <p>The following optimizations, while minor, seem worth mentioning because they may have wide applicability and are simple
 to implemement.</p>
-
 <p>We fit a curve to the PQ OETF which saves a few cycles, and the results are visually indistinguishable from the exact
 function. The curve was optimized to be accurate between 0.01 nits (a reasonable value for a &ldquo;just noticeable
 difference&rdquo; from black) and 1400 nits (the maximum output luminance that we generate, after matching SDR TV output, as
 explained above).</p>
-
 <figure>
 <a href="https://www.desmos.com/calculator/qbyomhxua3"><img src="/images/ifl_iss_hdr/pq_curve_fit.png"></a>
 <figcaption>
 <h4>Log-Log Plot of PQ OETF Approximation (<a href="https://www.desmos.com/calculator/qbyomhxua3">Desmos version</a>)</h4>
 </figcaption>
 </figure>
-<div class="highlight"><pre><code class="language-C++" data-lang="C++"><span class="c1">// Fast PQ encoding. Input is assumed to be positive and scaled such that 1.0 corresponds to 100 nits. Accurate over range </span>
-<span class="c1">//  0.01 - 1400 nits (and reasonable behavior outside of that range). </span>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++">
+<span class="c1">// Fast PQ encoding. Input is assumed to be positive and scaled such that 1.0 corresponds to 100 nits. Accurate over range 
+</span><span class="c1">//  0.01 - 1400 nits (and reasonable behavior outside of that range). 
+</span><span class="c1"></span>
 <span class="n">float3</span> <span class="nf">RgbPqFromLinearFast</span><span class="p">(</span><span class="n">float3</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">533095.76</span> <span class="o">+</span> <span class="mf">47438306.2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">29063622.1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">575216.76</span><span class="p">)</span> <span class="o">+</span> <span class="mf">383.09104</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.000487781</span><span class="p">)</span> <span class="o">/</span>
         <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">66391357.4</span> <span class="o">+</span> <span class="mf">81884528.2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">4182885.1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">10668.404</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">);</span>
     <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div>
-
-<p>We also fit a curve to the sRGB-to-linear conversion, which was useful in cases where we needed to filter linear values
+</code></pre></div><p>We also fit a curve to the sRGB-to-linear conversion, which was useful in cases where we needed to filter linear values
 (but could not use the hardware sRGB-to-linear conversion because of its limited precision). Again the results were
 visually indistinguishable (but beware of error accumulation from repeated use).</p>
-
 <figure>
 <a href="https://www.desmos.com/calculator/aqixhefatb"><img src="/images/ifl_iss_hdr/srgb_curve_fit.png"></a>
 <figcaption>
 <h4>Log-Log Plot of sRGB to Linear Approximation (<a href="https://www.desmos.com/calculator/aqixhefatb">Desmos version</a>)</h4>
 </figcaption>
 </figure>
-<div class="highlight"><pre><code class="language-C++" data-lang="C++"><span class="c1">// Fast(er) approximate sRGB-to-linear conversion. Accurate over range 0-2.7 (0-10 linear).</span>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++">
+<span class="c1">// Fast(er) approximate sRGB-to-linear conversion. Accurate over range 0-2.7 (0-10 linear).
+</span><span class="c1"></span>
 <span class="n">float3</span> <span class="nf">RgbLinearFromSrgbFast</span><span class="p">(</span><span class="n">float3</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">5.873392</span> <span class="o">+</span> <span class="mf">0.2533932</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.07841727</span><span class="p">))</span> <span class="o">/</span>
            <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">0.1470415</span> <span class="o">-</span> <span class="mf">1.2869875</span><span class="p">)</span> <span class="o">+</span> <span class="mf">6.3594828</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">);</span>
 <span class="p">}</span>
-</code></pre></div>
-
-<h1 id="pq-upscaling">PQ Upscaling</h1>
-
+</code></pre></div><h1 id="pq-upscaling">PQ Upscaling</h1>
 <p>On the PS4 Pro, we render to a resolution of 3200x1800, which is then upscaled to 4K (3840x2160) for output to the TV.
 Since the PQ OETF is highly non-linear, upscaling a PQ-encoded buffer introduces filtering artifacts (e.g., it tends to
 significantly reduce the luminance of small bright features). Because of this, we chose to do the upscaling in software,
 using a compute shader and LDS memory to amortize the conversion of samples.</p>
-
 <h1 id="in-closing">In Closing&hellip;</h1>
-
 <p>I hope you&rsquo;ve found these posts useful &mdash; please don&rsquo;t hesitate to leave comments or questions below!</p>
-
 <h1 id="further-reading">Further Reading</h1>
-
 <ol>
 <li>Part 1 of this series: <a href="/blog/2016/12/21/ifl_iss_hdr_1/">HDR Display Support in Infamous Second Son and Infamous First Light (Part 1)</a>.</li>
 <li><a href="https://en.wikipedia.org/wiki/Rec._709">Wikipedia page on Rec. 709</a>.</li>
@@ -285,19 +247,19 @@ using a compute shader and LDS memory to amortize the conversion of samples.</p>
     
 
     <div class="share">
-        <a class="icon-twitter" href="http://twitter.com/share?text=HDR%20Display%20Support%20in%20Infamous%20Second%20Son%20and%20Infamous%20First%20Light%20%28Part%202%29&url=http%3a%2f%2fwww.glowybits.com%2fblog%2f2017%2f01%2f04%2fifl_iss_hdr_2%2f"
+        <a class="icon-twitter" href="http://twitter.com/share?text=HDR%20Display%20Support%20in%20Infamous%20Second%20Son%20and%20Infamous%20First%20Light%20%28Part%202%29&url=https%3a%2f%2fwww.glowybits.com%2fblog%2f2017%2f01%2f04%2fifl_iss_hdr_2%2f"
             onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
             <i class="fa fa-twitter"></i>
             <span class="hidden">Twitter</span>
         </a>
 
-        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fwww.glowybits.com%2fblog%2f2017%2f01%2f04%2fifl_iss_hdr_2%2f"
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fwww.glowybits.com%2fblog%2f2017%2f01%2f04%2fifl_iss_hdr_2%2f"
             onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
             <i class="fa fa-facebook"></i>
             <span class="hidden">Facebook</span>
         </a>
 
-        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fwww.glowybits.com%2fblog%2f2017%2f01%2f04%2fifl_iss_hdr_2%2f"
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=https%3a%2f%2fwww.glowybits.com%2fblog%2f2017%2f01%2f04%2fifl_iss_hdr_2%2f"
            onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
            <i class="fa fa-google-plus"></i>
             <span class="hidden">Google+</span>
@@ -308,20 +270,25 @@ using a compute shader and LDS memory to amortize the conversion of samples.</p>
         
     <div class="comments">
         <div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'glowybits';
-    var disqus_identifier = 'http:\/\/www.glowybits.com\/blog\/2017\/01\/04\/ifl_iss_hdr_2\/';
-    var disqus_title = 'HDR Display Support in Infamous Second Son and Infamous First Light (Part 2)';
-    var disqus_url = 'http:\/\/www.glowybits.com\/blog\/2017\/01\/04\/ifl_iss_hdr_2\/';
-
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
     (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "glowybits" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
     })();
 </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
     </div>
 
     </article>
@@ -334,7 +301,7 @@ using a compute shader and LDS memory to amortize the conversion of samples.</p>
             <div class="container">
                 <div class="site-title-wrapper">
                     <h1 class="site-title">
-                        <a title="glowybits" href="http://www.glowybits.com/">glowybits</a>
+                        <a title="glowybits" href="https://www.glowybits.com/">glowybits</a>
                     </h1>
                     <a class="button-square button-jump-top js-jump-top" href="#">
                         <i class="fa fa-angle-up"></i>
@@ -350,9 +317,9 @@ using a compute shader and LDS memory to amortize the conversion of samples.</p>
             </div>
         </footer>
 
-        <script src="http://www.glowybits.com/js/jquery-1.11.3.min.js"></script>
-        <script src="http://www.glowybits.com/js/jquery.fitvids.js"></script>
-        <script src="http://www.glowybits.com/js/scripts.js"></script>
+        <script src="https://www.glowybits.com/js/jquery-1.11.3.min.js"></script>
+        <script src="https://www.glowybits.com/js/jquery.fitvids.js"></script>
+        <script src="https://www.glowybits.com/js/scripts.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">
          MathJax.Hub.Config({
@@ -364,15 +331,6 @@ using a compute shader and LDS memory to amortize the conversion of samples.</p>
                  skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
                  TeX: { equationNumbers: { autoNumber: "AMS" },
                         extensions: ["AMSmath.js", "AMSsymbols.js"] }
-             }
-         });
-         MathJax.Hub.Queue(function() {
-             
-             
-             
-             var all = MathJax.Hub.getAllJax(), i;
-             for(i = 0; i < all.length; i += 1) {
-                 all[i].SourceElement().parentNode.className += ' has-jax';
              }
          });
       </script>
