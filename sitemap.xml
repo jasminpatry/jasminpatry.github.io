@@ -2,22 +2,55 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://www.glowybits.com/tags/atmospherics/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/brdfs/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/fuzziness/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/ghost-of-tsushima/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/blog/2022/12/18/ghost_talks/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/graphics/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/lighting/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/post/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/sggx/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/shading/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/siggraph/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/subsurface-scattering/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
+    <loc>https://www.glowybits.com/tags/tonemapping/</loc>
+    <lastmod>2022-12-18T19:54:00-08:00</lastmod>
+  </url><url>
     <loc>https://www.glowybits.com/blog/2017/02/26/scene_to_screen/</loc>
     <lastmod>2017-02-26T16:45:54-08:00</lastmod>
   </url><url>
-    <loc>https://www.glowybits.com/</loc>
-    <lastmod>2017-02-26T16:45:54-08:00</lastmod>
-  </url><url>
-    <loc>https://www.glowybits.com/tags/graphics/</loc>
-    <lastmod>2017-02-26T16:45:54-08:00</lastmod>
-  </url><url>
     <loc>https://www.glowybits.com/tags/hdr/</loc>
-    <lastmod>2017-02-26T16:45:54-08:00</lastmod>
-  </url><url>
-    <loc>https://www.glowybits.com/post/</loc>
-    <lastmod>2017-02-26T16:45:54-08:00</lastmod>
-  </url><url>
-    <loc>https://www.glowybits.com/tags/</loc>
     <lastmod>2017-02-26T16:45:54-08:00</lastmod>
   </url><url>
     <loc>https://www.glowybits.com/blog/2017/01/04/ifl_iss_hdr_2/</loc>

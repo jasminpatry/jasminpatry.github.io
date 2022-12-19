@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Ghost of Tsushima SIGGRAPH Talks &middot; glowybits</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.87.0" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://www.glowybits.com/css/normalize.css">
+        <link rel="stylesheet" href="https://www.glowybits.com/css/style.css">
+        <link rel="stylesheet" href="https://www.glowybits.com/css/monokai.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cabin:400,400i,700,700i|Open+Sans:400,400i,700,700i&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <script src="https://kit.fontawesome.com/8e5e71023a.js" crossorigin="anonymous"></script>
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+        <link rel="manifest" href="/manifest.json">
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#813772">
+        <meta name="theme-color" content="#2a2630">
+    </head>
+    <body>
+        
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-87165311-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            
+                                <h1 class="site-title">
+                                    <a title="glowybits" href="https://www.glowybits.com/">glowybits</a>
+                                </h1>
+                            
+                        
+                        
+                            <h1 class="site-about">
+                                <a title="About" href="https://www.glowybits.com/page/about/index.html">About</a>
+                            </h1>
+                        
+                        <a class="button-square" href="https://www.glowybits.com/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                        <a class="button-square button-social hint--top" data-hint="Mastodon" title="Mastodon" href="https://mastodon.gamedev.place/@jasminpatry">
+                            <i class="fa-brands fa-mastodon"></i>
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    </div>
+
+                    
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Ghost of Tsushima SIGGRAPH Talks</h1>
+    
+    <p class="post-byline">
+        Posted by
+        <span class="post-author" itemscope="" itemprop="author" itemtype="http://schema.org/Person">
+            <span itemprop="name">
+                <a href="https://mastodon.gamedev.place/@jasminpatry" itemprop="url" rel="author">Jasmin Patry</a>
+            </span>
+        </span>
+        on
+        <span class="post-date">
+            <time datetime="2022-12-18" itemprop="datePublished">December 18, 2022</time>
+        </span>
+    </p>
+</header>
+
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    <h1 id="contents">Contents</h1>
+<ol>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#s2020">Samurai Shading in <em>Ghost of Tsushima</em></a></li>
+<li><a href="#s2021">Real-Time Samurai Cinema: Lighting, Atmosphere, and Tonemapping in <em>Ghost of Tsushima</em></a></li>
+</ol>
+<h1 id="introduction">Introduction</h1>
+<p>After finishing work on <a href="https://www.playstation.com/en-us/games/ghost-of-tsushima/">Ghost of Tsushima</a>, I was lucky
+enough to fulfill one of my life goals (twice over!), by giving a couple of SIGGRAPH talks. The first was in 2020 as
+part of the <a href="https://blog.selfshadow.com/publications/s2020-shading-course/">Physically Based Shading in Theory and
+Practice</a> course, and the second was in 2021 as part of
+the <a href="https://advances.realtimerendering.com/s2021/index.html">Advances in Real-Time Rendering in Games</a> course. I was
+very grateful to have the opportunity to share the work that our team did on the game, and try to give something back to
+the graphics community that has shared so generously with me.</p>
+<p>The official versions of these presentations can be found at the links above, but for posterity I&rsquo;m also mirroring them
+here.</p>
+<h1 id="div-ids2020divsamurai-shading-in-ghost-of-tsushimabrsmallsiggraph-2020-physically-based-shading-in-theory-and-practice-coursesmall"><div id="s2020"></div>Samurai Shading in <em>Ghost of Tsushima</em><br><small>(SIGGRAPH 2020 Physically Based Shading In Theory and Practice Course)</small></h1>
+<h2 id="abstract">Abstract</h2>
+<p>In this talk, we describe some of the physically based shading research performed at Sucker Punch since the release of
+<em>Infamous: First Light</em>. This work was used in the development of the upcoming PlayStation 4 game <em>Ghost of Tsushima</em>,
+an open-world action adventure set in 13<sup>th</sup>&ndash;century feudal Japan.</p>
+<p>First, we describe our anisotropic specular material representation, inspired by <a href="https://research.nvidia.com/sites/default/files/pubs/2015-08_The-SGGX-microflake/sggx.pdf"><em>The SGGX Microflake Distribution</em> <i
+class="fa-solid
+fa-file-pdf"></i></a> of Heitz
+et al. This allows us to encode anisotropic GGX roughness with spatially-varying orientation in a single compressed
+texture, supporting hardware filtering and mipmapping. We also show how we use the SGGX representation to prefilter
+normal and anisotropic roughness maps; this allows us to preserve the appearance of anisotropic normal distributions at
+varying scales with no additional runtime cost.</p>
+<p>We then present a new real-time asperity scattering model that is able to recreate the anisotropic appearance of
+materials such as crushed velvet. We also describe a simplified version of this BRDF (developed by Eric Wohllaib for use
+in our deferred renderer), suitable for representing materials such as felt and moss-covered rocks.</p>
+<p>Next, we describe an improvement to the well-known <a href="https://www.taylorfrancis.com/chapters/edit/10.1201/b11325-9/pre-integrated-skin-shading-eric-penner-george-borshukov"><em>Pre-Integrated Skin
+Shading</em></a>
+technique by Penner and Borshukov via the use of mesh curvature tensors, which better approximate the geometry in the
+direction of scattering. We also emphasize the importance of using the correct integration method when computing lookup
+tables for punctual lights and spherical harmonics.</p>
+<p>Finally, in extra slides not included in the recorded talk, we present a novel approach for authoring physically based
+materials at low and high spatial frequencies. The approach we developed takes the idea of traditional &ldquo;detail maps&rdquo;
+and turns it on its head, allowing artists to intuitively author large-scale variation on top of physically based
+tileable materials, while minimizing run-time memory and shader overhead.</p>
+<h2 id="materials">Materials</h2>
+<ul>
+<li><a href="/talks/samurai_shading_in_ghost_of_tsushima/index.html">Interactive Slides</a></li>
+<li><a href="/talks/samurai_shading_in_ghost_of_tsushima/samurai_shading_in_ghost_of_tsushima.pdf">Static Slides <i class="fa-solid fa-file-pdf"></i></a></li>
+<li><a href="/talks/samurai_shading_in_ghost_of_tsushima/samurai_shading_in_ghost_of_tsushima_supplemental.pdf">Supplemental Material  <i class="fa-solid fa-file-pdf"></i></a></li>
+</ul>
+<h2 id="recording">Recording</h2>
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/LC8VedwibkI" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+&nbsp;
+<h1 id="div-ids2021divreal-time-samurai-cinema-lighting-atmosphere-and-tonemapping-in-ghost-of-tsushimabrsmallsiggraph-2021-advances-in-real-time-rendering-in-games-coursesmall"><div id="s2021"></div>Real-Time Samurai Cinema: Lighting, Atmosphere, and Tonemapping in <em>Ghost of Tsushima</em><br><small>(SIGGRAPH 2021 Advances in Real-Time Rendering in Games Course)</small></h1>
+<h2 id="abstract-1">Abstract</h2>
+<p>In this talk, we describe some of the graphics techniques used in the production of <em>Ghost of Tsushima</em>. Set in
+13<sup>th</sup> century Japan, <em>Ghost of Tsushima</em> pays homage to classic samurai cinema with dramatic lighting, wind,
+clouds, haze, and fog, and features a beautiful open-world version of the island of Tsushima during the first Mongol
+invasion. In this talk, we will cover the diffuse and specular indirect lighting techniques used in the game including
+methods of computing SH irradiance probes from sky visibility data, including plausible sky and sun/moon bounce light.
+Next, we present our atmospheric lighting and rendering techniques, including how we lit our haze, clouds, and particles
+with multiple scattering. We show how to improve the accuracy of Rayleigh scattering to approach that of spectral
+rendering by using a custom color space for atmospheric lighting calculations. Finally, we discuss some of the
+tonemapping techniques we used to recreate the samurai cinema experience in-game.</p>
+<h2 id="materials-1">Materials</h2>
+<ul>
+<li><a href="/talks/real-time_samurai_cinema/index.html">Interactive Slides</a></li>
+<li><a href="/talks/real-time_samurai_cinema/real-time_samurai_cinema.pdf">Static Slides <i class="fa-solid fa-file-pdf"></i></a></li>
+</ul>
+<h2 id="recording-1">Recording</h2>
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/GOee6lcEbWg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+&nbsp;
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+                 <a href="/tags/atmospherics/">Atmospherics</a>
+            
+                 <a href="/tags/brdfs/">BRDFs</a>
+            
+                 <a href="/tags/fuzziness/">Fuzziness</a>
+            
+                 <a href="/tags/ghost-of-tsushima/">Ghost of Tsushima</a>
+            
+                 <a href="/tags/graphics/">Graphics</a>
+            
+                 <a href="/tags/lighting/">Lighting</a>
+            
+                 <a href="/tags/sggx/">SGGX</a>
+            
+                 <a href="/tags/siggraph/">SIGGRAPH</a>
+            
+                 <a href="/tags/shading/">Shading</a>
+            
+                 <a href="/tags/subsurface-scattering/">Subsurface Scattering</a>
+            
+                 <a href="/tags/tonemapping/">Tonemapping</a>
+            
+        </p>
+    
+
+    <div class="share">
+        <a class="icon-mastodon" href="https://toot.kytta.dev/?text=Check%20out%20https%3a%2f%2fwww.glowybits.com%2fblog%2f2022%2f12%2f18%2fghost_talks%2f"
+           onclick="window.open(this.href, 'mastodon-share','width=580,height=296');return false;">
+            <i class="fa-brands fa-mastodon"></i>
+            <span class="hidden">Mastodon</span>
+        </a>
+    </div>
+</footer>
+
+
+        
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="glowybits" href="https://www.glowybits.com/">glowybits</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span class="nobr">&copy; 2022 <a rel="me" href="https://mastodon.gamedev.place/@jasminpatry">Jasmin Patry</a> /</span>
+                    <span class="nobr">Hosted by <a href="http://pages.github.com" >Github Pages</a> /</span>
+                    <span class="nobr">Powered by <a href="http://gohugo.io/">Hugo</a> /</span>
+                    <span class="nobr">Based on <a href="https://github.com/jbub/ghostwriter">Ghostwriter</a> theme</span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="https://www.glowybits.com/js/jquery-1.11.3.min.js"></script>
+        <script src="https://www.glowybits.com/js/jquery.fitvids.js"></script>
+        <script src="https://www.glowybits.com/js/scripts.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+         MathJax.Hub.Config({
+             tex2jax: {
+                 inlineMath: [['$','$'], ['\\(','\\)']],
+                 displayMath: [['$$','$$'], ['\\[','\\]']],
+                 processEscapes: true,
+                 processEnvironments: true,
+                 skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                 TeX: { equationNumbers: { autoNumber: "AMS" },
+                        extensions: ["AMSmath.js", "AMSsymbols.js"] }
+             }
+         });
+      </script>
+    </body>
+</html>
+

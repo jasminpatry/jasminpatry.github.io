@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="https://www.glowybits.com/css/style.css">
         <link rel="stylesheet" href="https://www.glowybits.com/css/monokai.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cabin:400,400i,700,700i|Open+Sans:400,400i,700,700i&subset=latin,cyrillic-ext,latin-ext,cyrillic">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <script src="https://kit.fontawesome.com/8e5e71023a.js" crossorigin="anonymous"></script>
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
         <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
         <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -54,9 +54,10 @@ if (!doNotTrack) {
                         
                         <a class="button-square" href="https://www.glowybits.com/index.xml"><i class="fa fa-rss"></i></a>
                         
-                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/jasminpatry">
-                                <i class="fa fa-twitter"></i>
-                            </a>
+                        <a class="button-square button-social hint--top" data-hint="Mastodon" title="Mastodon" href="https://mastodon.gamedev.place/@jasminpatry">
+                            <i class="fa-brands fa-mastodon"></i>
+                        </a>
+                        
                         
                         
                         
@@ -81,7 +82,7 @@ if (!doNotTrack) {
         Posted by
         <span class="post-author" itemscope="" itemprop="author" itemtype="http://schema.org/Person">
             <span itemprop="name">
-                <a href="https://twitter.com/jasminpatry" itemprop="url" rel="author">Jasmin Patry</a>
+                <a href="https://mastodon.gamedev.place/@jasminpatry" itemprop="url" rel="author">Jasmin Patry</a>
             </span>
         </span>
         on
@@ -285,50 +286,16 @@ combining HDR and 4K on the PS4 Pro.</p>
     
 
     <div class="share">
-        <a class="icon-twitter" href="http://twitter.com/share?text=HDR%20Display%20Support%20in%20Infamous%20Second%20Son%20and%20Infamous%20First%20Light%20%28Part%201%29&url=https%3a%2f%2fwww.glowybits.com%2fblog%2f2016%2f12%2f21%2fifl_iss_hdr_1%2f"
-            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
-            <i class="fa fa-twitter"></i>
-            <span class="hidden">Twitter</span>
-        </a>
-
-        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fwww.glowybits.com%2fblog%2f2016%2f12%2f21%2fifl_iss_hdr_1%2f"
-            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
-            <i class="fa fa-facebook"></i>
-            <span class="hidden">Facebook</span>
-        </a>
-
-        <a class="icon-google-plus" href="https://plus.google.com/share?url=https%3a%2f%2fwww.glowybits.com%2fblog%2f2016%2f12%2f21%2fifl_iss_hdr_1%2f"
-           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
-           <i class="fa fa-google-plus"></i>
-            <span class="hidden">Google+</span>
+        <a class="icon-mastodon" href="https://toot.kytta.dev/?text=Check%20out%20https%3a%2f%2fwww.glowybits.com%2fblog%2f2016%2f12%2f21%2fifl_iss_hdr_1%2f"
+           onclick="window.open(this.href, 'mastodon-share','width=580,height=296');return false;">
+            <i class="fa-brands fa-mastodon"></i>
+            <span class="hidden">Mastodon</span>
         </a>
     </div>
 </footer>
 
-        
-    <div class="comments">
-        <div id="disqus_thread"></div>
-<script type="application/javascript">
-    var disqus_config = function () {
-    
-    
-    
-    };
-    (function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
-            return;
-        }
-        var d = document, s = d.createElement('script'); s.async = true;
-        s.src = '//' + "glowybits" + '.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-    </div>
 
+        
     </article>
 </div>
 
@@ -347,7 +314,7 @@ combining HDR and 4K on the PS4 Pro.</p>
                 </div>
 
                 <p class="footer-copyright">
-                    <span class="nobr">&copy; 2017 Jasmin Patry /</span>
+                    <span class="nobr">&copy; 2022 <a rel="me" href="https://mastodon.gamedev.place/@jasminpatry">Jasmin Patry</a> /</span>
                     <span class="nobr">Hosted by <a href="http://pages.github.com" >Github Pages</a> /</span>
                     <span class="nobr">Powered by <a href="http://gohugo.io/">Hugo</a> /</span>
                     <span class="nobr">Based on <a href="https://github.com/jbub/ghostwriter">Ghostwriter</a> theme</span>

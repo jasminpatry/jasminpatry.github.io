@@ -7,13 +7,103 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Jasmin Patry</copyright>
-    <lastBuildDate>Sun, 26 Feb 2017 16:45:54 -0800</lastBuildDate><atom:link href="https://www.glowybits.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 18 Dec 2022 19:54:00 -0800</lastBuildDate><atom:link href="https://www.glowybits.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Atmospherics</title>
+      <link>https://www.glowybits.com/tags/atmospherics/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/atmospherics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>BRDFs</title>
+      <link>https://www.glowybits.com/tags/brdfs/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/brdfs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Fuzziness</title>
+      <link>https://www.glowybits.com/tags/fuzziness/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/fuzziness/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ghost of Tsushima</title>
+      <link>https://www.glowybits.com/tags/ghost-of-tsushima/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/ghost-of-tsushima/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Graphics</title>
       <link>https://www.glowybits.com/tags/graphics/</link>
-      <pubDate>Sun, 26 Feb 2017 16:45:54 -0800</pubDate>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
       
       <guid>https://www.glowybits.com/tags/graphics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Lighting</title>
+      <link>https://www.glowybits.com/tags/lighting/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/lighting/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SGGX</title>
+      <link>https://www.glowybits.com/tags/sggx/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/sggx/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Shading</title>
+      <link>https://www.glowybits.com/tags/shading/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/shading/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SIGGRAPH</title>
+      <link>https://www.glowybits.com/tags/siggraph/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/siggraph/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Subsurface Scattering</title>
+      <link>https://www.glowybits.com/tags/subsurface-scattering/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/subsurface-scattering/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tonemapping</title>
+      <link>https://www.glowybits.com/tags/tonemapping/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/tags/tonemapping/</guid>
       <description></description>
     </item>
     

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ghost of Tsushima on glowybits</title>
+    <link>https://www.glowybits.com/tags/ghost-of-tsushima/</link>
+    <description>Recent content in Ghost of Tsushima on glowybits</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Jasmin Patry</copyright>
+    <lastBuildDate>Sun, 18 Dec 2022 19:54:00 -0800</lastBuildDate><atom:link href="https://www.glowybits.com/tags/ghost-of-tsushima/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ghost of Tsushima SIGGRAPH Talks</title>
+      <link>https://www.glowybits.com/blog/2022/12/18/ghost_talks/</link>
+      <pubDate>Sun, 18 Dec 2022 19:54:00 -0800</pubDate>
+      
+      <guid>https://www.glowybits.com/blog/2022/12/18/ghost_talks/</guid>
+      <description>Contents  Introduction Samurai Shading in Ghost of Tsushima Real-Time Samurai Cinema: Lighting, Atmosphere, and Tonemapping in Ghost of Tsushima  Introduction After finishing work on Ghost of Tsushima, I was lucky enough to fulfill one of my life goals (twice over!), by giving a couple of SIGGRAPH talks. The first was in 2020 as part of the Physically Based Shading in Theory and Practice course, and the second was in 2021 as part of the Advances in Real-Time Rendering in Games course.</description>
+    </item>
+    
+  </channel>
+</rss>
